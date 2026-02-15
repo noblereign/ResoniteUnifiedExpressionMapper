@@ -14,9 +14,11 @@
 		<ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>
 		<ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')">C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath>
 		<ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')">$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+		<ResonitePath Condition="Exists('P:\SteamLibrary\steamapps\common\Resonite\')">P:\SteamLibrary\steamapps\common\Resonite\</ResonitePath>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3"></PackageReference>
 		<Reference Include="ResoniteModLoader">
 			<HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
 			<Private>False</Private>
@@ -25,7 +27,10 @@
 			<HintPath>$(ResonitePath)rml_libs\0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="FrooxEngine">
+    <Reference Include="Renderite.Shared">
+      <HintPath>$(ResonitePath)Renderite.Shared.dll</HintPath>
+    </Reference>
+		<Reference Include="FrooxEngine" Publicize="true">
 			<HintPath>$(ResonitePath)FrooxEngine.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
