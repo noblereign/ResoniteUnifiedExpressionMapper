@@ -79,6 +79,19 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		static void Postfix(AvatarExpressionDriver __instance, ref AvatarExpression? __result, List<string> names, string name, Chirality? chirality) {
 			if (!Config!.GetValue(Enabled)) return;
 			if (__result == null && UnifiedExpressionMap.TryGetValue(name, out var expression)) {
+				//TODO: Sometimes an avatar will have the normal shape as well as the split one. e.g. MouthSmile alongside MouthSmileLeft and MouthSmileRight
+				//Sometimes Resonite will detect that MouthSmile and assign it, then afterwards we end up detecting the Left and Right versions.
+				//This causes three shapes to be mapped to one expression, screwing with the face tracking quality.
+				//Ideally we would want the split ones to be the only ones mapped in that scenario.
+
+				//TODO: Sometimes an avatar will have MULTIPLE face tracking standard blendshapes on it. For example, Unified Expressions and ARKit together.
+				//In extreme cases some may have UE, ARKit, and SRAnipal.
+				//In these cases we want to prioritize: Unified Expressions > ARKit > SRAnipal.
+				//Unsure if that's possible though-- in reality we may just want to limit the amount of detected shapes for each.
+				//Possibly do-able with a prefix tracking which have been detected?
+
+				//We may want to hook into the actual expression driver function for this, instead of JUST the determine expression patch. 
+
 				__result = expression;
 			}
 		}
