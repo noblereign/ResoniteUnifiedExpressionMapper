@@ -4,6 +4,7 @@ using FrooxEngine.UIX;
 using HarmonyLib;
 using Renderite.Shared;
 using ResoniteModLoader;
+using CustomUILib;
 
 namespace UnifiedExpressionMapper;
 
@@ -274,6 +275,8 @@ public class UnifiedExpressionMapper : ResoniteMod {
 
 		Harmony harmony = new("dog.glacier.UnifiedExpressionMapper");
 		harmony.PatchAll();
+
+		CustomUILib.CustomUILib.AddCustomInspectorAfter<EyeLinearDriver>(BuildInspectorUI);
 	}
 
 	[HarmonyPatch(typeof(AvatarExpressionDriver), "DetermineExpression")]
@@ -379,7 +382,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 					string shapeName = kvp.Key;
 					AvatarExpression expr = kvp.Value;
 
-					if (ctx.BlendshapeNames.Contains(shapeName)) {
+					if (ctx.BlendshapeNames.Contains(shapeName) && !ctx.SuppressedShapes.Contains(shapeName)) {
 						if (!expressionToBestString.ContainsKey(expr)) {
 							expressionToBestString[expr] = shapeName;
 							ctx.MappedShapes[shapeName] = expr;
@@ -402,15 +405,15 @@ public class UnifiedExpressionMapper : ResoniteMod {
 
 
 
-	[HarmonyPatch(typeof(AvatarCreator), "SetupEyes", typeof(SkinnedMeshRenderer))]
+	[HarmonyPatch(typeof(AvatarCreator), "SetupEyes")]
 	class AvatarCreator_SetupEyes_Patch {
-		static void Postfix(AvatarCreator __instance, Slot headReference, Slot leftEye, Slot rightEye, BipedRig rig, Slot avatarRoot) {
-			if (!Config!.GetValue(Enabled)) return;
-			if (!Config!.GetValue(AssignEyesOnCreation)) return;
+		static void Postfix(Slot headReference, Slot leftEye, Slot rightEye, BipedRig rig, Slot avatarRoot) {
+			if (!Config!.GetValue(Enabled)) { Msg($"UnifiedExpressionMapper is disabled, so not automatically setting up eye shapes for {avatarRoot.Name}"); return; };
+			if (!Config!.GetValue(AssignEyesOnCreation)) { Msg($"Assign Eyes On Creation is disabled, so not automatically setting up eye shapes for {avatarRoot.Name}"); return; };
 			Slot eyeManagerRoot = rig[BodyNode.Head].FindChild("Eye Manager");
-			if (eyeManagerRoot == null) return;
+			if (eyeManagerRoot == null) { Warn($"Could not find eye manager root for {avatarRoot.Name}!"); return; };
 			EyeLinearDriver linearDriver = eyeManagerRoot.GetComponent<EyeLinearDriver>();
-			if (linearDriver == null) return;
+			if (linearDriver == null) { Warn($"Could not find eye linear driver for {avatarRoot.Name}"); return; };
 			AssignEyeShapes(linearDriver);
 		}
 	}
@@ -421,7 +424,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		var skinnedRenderers = eyeLinearDriver.Slot.GetObjectRoot().GetComponentsInChildren<SkinnedMeshRenderer>(renderer => renderer.MeshBlendshapeCount > 0).ToArray();
 		primaryRenderer = primaryRenderer ?? skinnedRenderers.OrderByDescending(renderer => renderer.MeshBlendshapeCount).First();
 
-		if (primaryRenderer == null) return;
+		if (primaryRenderer == null) { Warn($"Couldn't find a primary renderer for {eyeLinearDriver.Slot.GetObjectRoot().Name}"); return; };
 
 		var blendshapes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 		for (int i = 0; i < primaryRenderer.MeshBlendshapeCount; i++) {
@@ -507,9 +510,9 @@ public class UnifiedExpressionMapper : ResoniteMod {
 			new[] { "EyeDilation", "eyeDilation", "Eye_Dilation" });
 
 		AssignFeature(e => e.InnerBrowRaiseTarget,
-			new[] { "BrowInnerUpLeft", "browInnerUpLeft", "Inner_Brow_Raiser_L" },
-			new[] { "BrowInnerUpRight", "browInnerUpRight", "Inner_Brow_Raiser_R" },
-			new[] { "BrowInnerUp", "browInnerUp", "Inner_Brow_Riaser" });
+			new[] { "BrowUpLeft", "BrowInnerUpLeft", "browInnerUpLeft", "Inner_Brow_Raiser_L" },
+			new[] { "BrowUpRight", "BrowInnerUpRight", "browInnerUpRight", "Inner_Brow_Raiser_R" },
+			new[] { "BrowUp", "BrowInnerUp", "browInnerUp", "Inner_Brow_Raiser" });
 
 		AssignFeature(e => e.OuterBrowRaiseTarget,
 			new[] { "BrowOuterUpLeft", "browOuterUpLeft", "Outer_Brow_Raiser_L" },
@@ -522,46 +525,44 @@ public class UnifiedExpressionMapper : ResoniteMod {
 			new[] { "BrowLowerer", "browDown", "Brow_Lowerer" });
 	}
 
-	[HarmonyPatch(typeof(EyeLinearDriver), "BuildInspectorUI")]
-	class EyeLinearDriver_BuildInspectorUI_Patch {
-		public static void Postfix(EyeLinearDriver __instance, UIBuilder ui) {
-			if (!Config!.GetValue(Enabled)) return;
 
-			ui.Style.MinHeight = 24f;
-			ui.Text("Unified Expression Mapper (Mod)").Color.Value = RadiantUI_Constants.Hero.CYAN;
-			ui.Style.MinHeight = 2f;
-			ui.Image(RadiantUI_Constants.Hero.CYAN);
-			ui.Style.MinHeight = 24f;
+	public static void BuildInspectorUI(EyeLinearDriver component, UIBuilder ui) {
+		if (!Config!.GetValue(Enabled)) { Msg($"UnifiedExpressionMapper is disabled, so not generating new ui for {component.Slot.Name}"); return; }
 
-			Button autoAssignButton = ui.Button("Auto-assign blendshapes");
+		ui.Style.MinHeight = 24f;
+		ui.Text("Unified Expression Mapper (Mod)").Color.Value = RadiantUI_Constants.Hero.CYAN;
+		ui.Style.MinHeight = 2f;
+		ui.Image(RadiantUI_Constants.Hero.CYAN);
+		ui.Style.MinHeight = 24f;
 
-			autoAssignButton.LocalPressed += (btn, data) => {
-				__instance.World.RunSynchronously(() => {
-					AssignEyeShapes(__instance);
-				});
-			};
+		Button autoAssignButton = ui.Button("Auto-assign blendshapes");
 
-			// referencing https://github.com/TheJebForge/BoneReferenceHelper/blob/master/BoneReferenceHelper.cs#L97
-			Slot infoHolder = ui.Empty("Info Holder");
-			ui.NestInto(infoHolder);
+		autoAssignButton.LocalPressed += (btn, data) => {
+			component.World.RunSynchronously(() => {
+				AssignEyeShapes(component);
+			});
+		};
+
+		// referencing https://github.com/TheJebForge/BoneReferenceHelper/blob/master/BoneReferenceHelper.cs#L97
+		Slot infoHolder = ui.Empty("Info Holder");
+		ui.NestInto(infoHolder);
+		{
+			ui.HorizontalLayout(4f);
 			{
-				ui.HorizontalLayout(4f);
-				{
-					ReferenceField<SkinnedMeshRenderer> slotField = infoHolder.AttachComponent<ReferenceField<SkinnedMeshRenderer>>();
+				ReferenceField<SkinnedMeshRenderer> slotField = infoHolder.AttachComponent<ReferenceField<SkinnedMeshRenderer>>();
 
-					const string key = "Mesh";
-					SyncMemberEditorBuilder.Build(
-						slotField.GetSyncMember(key),
-						"Mesh",
-						slotField.GetSyncMemberFieldInfo(key),
-						ui);
+				const string key = "Reference";
+				SyncMemberEditorBuilder.Build(
+					slotField.GetSyncMember(key),
+					"Mesh",
+					slotField.GetSyncMemberFieldInfo(key),
+					ui);
 
-					ui.Button("Assign blendshapes from mesh").LocalPressed += (button, _) => AssignEyeShapes(__instance, slotField.Reference.Target);
-				}
-				ui.NestOut();
+				ui.Button("Assign blendshapes from mesh").LocalPressed += (button, _) => AssignEyeShapes(component, slotField.Reference.Target);
 			}
 			ui.NestOut();
 		}
+		ui.NestOut();
 	}
 
 }
