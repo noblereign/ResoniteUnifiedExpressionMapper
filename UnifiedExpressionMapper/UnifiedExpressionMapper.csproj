@@ -30,6 +30,9 @@
     <Reference Include="Renderite.Shared">
       <HintPath>$(ResonitePath)Renderite.Shared.dll</HintPath>
     </Reference>
+    <Reference Include="Elements.Core">
+      <HintPath>$(ResonitePath)Elements.Core.dll</HintPath>
+    </Reference>
 		<Reference Include="FrooxEngine" Publicize="true">
 			<HintPath>$(ResonitePath)FrooxEngine.dll</HintPath>
 			<Private>False</Private>
