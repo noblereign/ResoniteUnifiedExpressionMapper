@@ -3,14 +3,16 @@
 A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader) mod for [Resonite](https://resonite.com/) that adds support for UE, ARKit, SRanipal, and FACS Reduced face tracking to the auto-assigner.
 It also adds an auto-assigner for eye tracking. In theory, you should be able to import an avatar and have it fully face tracked from the get-go!
 
-
 If you think this should be a part of the base game, please [thumbs-up the issue](https://github.com/Yellow-Dog-Man/Resonite-Issues/issues/2973) to let the Resonite Team know to prioritize it!
 
 Requires [CustomUILib](https://github.com/art0007i/CustomUILib).
 
-
-## Screenshots
-<!-- If your mod has visible effects in the game, attach some images or video of it in-use here! Otherwise remove this section -->
+## Comparison
+<!--i need to open github to upload the photo 😭 why are u looking at commit history-->
+Unlike vanilla, the mod...
+- Ensures that if a blendshape has a split variant alongside a combined variant, it only drives the split ones. (Notice how vanilla drives `NoseSneer`, `LipPucker`, `MouthLowerDown`...)
+- Detects and properly remaps more shapes, e.g. `CheekSquint`, `LipSuck`, `LipFunnel`, `MouthStretch`, `MouthTightener`, `MouthPress`.
+- Automatically assigns eye and brow expressions. (Vanilla only does this for blink)
 
 ## Installation
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader).
