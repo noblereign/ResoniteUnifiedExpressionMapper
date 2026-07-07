@@ -3,9 +3,10 @@
 A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader) mod for [Resonite](https://resonite.com/) that adds support for UE, ARKit, SRanipal, and FACS Reduced face tracking to the auto-assigner.
 It also adds an auto-assigner for eye tracking. In theory, you should be able to import an avatar and have it fully face tracked from the get-go!
 
-If you think this should be a part of the base game, please [thumbs-up the issue](https://github.com/Yellow-Dog-Man/Resonite-Issues/issues/2973) to let the Resonite Team know to prioritize it!
+**Requires [CustomUILib](https://github.com/art0007i/CustomUILib).**
 
-Requires [CustomUILib](https://github.com/art0007i/CustomUILib).
+> [!IMPORTANT]
+> If you think this should be a part of the base game, **please [thumbs-up the issue](https://github.com/Yellow-Dog-Man/Resonite-Issues/issues/2292)** to let the Resonite Team know to prioritize it!
 
 ## Comparison
 
