@@ -8,11 +8,12 @@ If you think this should be a part of the base game, please [thumbs-up the issue
 Requires [CustomUILib](https://github.com/art0007i/CustomUILib).
 
 ## Comparison
-<!--i need to open github to upload the photo 😭 why are u looking at commit history-->
+
 Unlike vanilla, the mod...
 - Ensures that if a blendshape has a split variant alongside a combined variant, it only drives the split ones. (Notice how vanilla drives `NoseSneer`, `LipPucker`, `MouthLowerDown`...)
 - Detects and properly remaps more shapes, e.g. `CheekSquint`, `LipSuck`, `LipFunnel`, `MouthStretch`, `MouthTightener`, `MouthPress`.
 - Automatically assigns eye and brow expressions. (Vanilla only does this for blink)
+<img width="1411" height="1086" alt="comparison" src="https://github.com/user-attachments/assets/521359e1-c9b8-4713-835f-6a25348b21ff" />
 
 ## Installation
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader).
