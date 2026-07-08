@@ -13,10 +13,15 @@ internal class AutoAssignContext {
 	public HashSet<string> SuppressedShapes = new(StringComparer.OrdinalIgnoreCase);
 	public Dictionary<string, AvatarExpression> MappedShapes = new(StringComparer.OrdinalIgnoreCase);
 }
+internal enum FallbackStrategy {
+	NoStandardDetected,
+	Never,
+	Always
+}
 
 //More info on creating mods can be found https://github.com/resonite-modding-group/ResoniteModLoader/wiki/Creating-Mods
 public class UnifiedExpressionMapper : ResoniteMod {
-	internal const string VERSION_CONSTANT = "1.0.1";
+	internal const string VERSION_CONSTANT = "1.1.0";
 	public override string Name => "UnifiedExpressionMapper";
 	public override string Author => "Noble";
 	public override string Version => VERSION_CONSTANT;
@@ -29,6 +34,9 @@ public class UnifiedExpressionMapper : ResoniteMod {
 
 	[AutoRegisterConfigKey]
 	public static readonly ModConfigurationKey<bool> AssignEyesOnCreation = new("Auto-assign eye shapes on avatar creation", "When finalizing the avatar in the Avatar Creator, should eyetracking blendshapes be auto-assigned?", () => true);
+
+	[AutoRegisterConfigKey]
+	private static readonly ModConfigurationKey<FallbackStrategy> UseHeurstics = new("Fallback Strategy", "When should blendshapes be assigned based on vanilla heuristics? The available options are:\n\n<color=hero.yellow>NoStandardDetected</color> - Only when no other blendshapes were matched by the mod; the avatar's shape names are unconventional, or maybe has no true face-tracking at all.\n\n<color=hero.yellow>Never</color> - Never use heurstics, leave unknown blendshapes unassigned.\n\n<color=hero.yellow>Always</color> - Always fall back if the blendshape doesn't match any standardized naming.", () => FallbackStrategy.NoStandardDetected);
 
 	[ThreadStatic]
 	internal static AutoAssignContext? CurrentContext;
@@ -70,6 +78,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		["LipFunnelLower"] = AvatarExpression.LipBottomOverturn,
 		["LipFunnelLowerLeft"] = AvatarExpression.LipBottomLeftOverturn,
 		["LipFunnelLowerRight"] = AvatarExpression.LipBottomRightOverturn,
+
 		["LipPucker"] = AvatarExpression.Pout,
 		["LipPuckerLeft"] = AvatarExpression.PoutLeft,
 		["LipPuckerRight"] = AvatarExpression.PoutRight,
@@ -89,9 +98,11 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		["MouthSmile"] = AvatarExpression.Smile,
 		["MouthSmileLeft"] = AvatarExpression.SmileLeft,
 		["MouthSmileRight"] = AvatarExpression.SmileRight,
+
 		["MouthFrown"] = AvatarExpression.Frown,
 		["MouthFrownLeft"] = AvatarExpression.FrownLeft,
 		["MouthFrownRight"] = AvatarExpression.FrownRight,
+
 		["MouthStretch"] = AvatarExpression.LipStretch,
 		["MouthStretchLeft"] = AvatarExpression.LipStretchLeft,
 		["MouthStretchRight"] = AvatarExpression.LipStretchRight,
@@ -319,7 +330,20 @@ public class UnifiedExpressionMapper : ResoniteMod {
 				}
 			}
 
-			return true; // frooxengine heuristics time
+			FallbackStrategy CurrentStrategy = Config!.GetValue(UseHeurstics);
+			if (CurrentStrategy == FallbackStrategy.Always) {
+				return true; // frooxengine heuristics time
+			} else if (CurrentStrategy == FallbackStrategy.Never) {
+				__result = null;
+				return false;
+			} else {
+				if (CurrentContext != null && CurrentContext.MappedShapes.Count > 0) {
+					__result = null;
+					return false;
+				} else {
+					return true;
+				}
+			}
 		}
 	}
 
