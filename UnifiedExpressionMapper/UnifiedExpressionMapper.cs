@@ -16,7 +16,7 @@ internal class AutoAssignContext {
 
 //More info on creating mods can be found https://github.com/resonite-modding-group/ResoniteModLoader/wiki/Creating-Mods
 public class UnifiedExpressionMapper : ResoniteMod {
-	internal const string VERSION_CONSTANT = "1.0.0";
+	internal const string VERSION_CONSTANT = "1.0.1";
 	public override string Name => "UnifiedExpressionMapper";
 	public override string Author => "Noble";
 	public override string Version => VERSION_CONSTANT;
@@ -80,10 +80,9 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		["MouthLowerDown"] = AvatarExpression.LipRaiseLower,
 		["MouthLowerDownLeft"] = AvatarExpression.LipRaiseLowerLeft,
 		["MouthLowerDownRight"] = AvatarExpression.LipRaiseLowerRight,
-		["MouthLeft"] = AvatarExpression.LipMoveLeftLower, // there is no LipMoveLeft, only upper or lower
+
 		["MouthUpperLeft"] = AvatarExpression.LipMoveLeftUpper,
 		["MouthLowerLeft"] = AvatarExpression.LipMoveLeftLower,
-		["MouthRight"] = AvatarExpression.LipMoveRightLower, // there is no LipMoveRight, only upper or lower
 		["MouthUpperRight"] = AvatarExpression.LipMoveRightUpper,
 		["MouthLowerRight"] = AvatarExpression.LipMoveRightLower,
 
