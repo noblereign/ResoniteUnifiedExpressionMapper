@@ -41,6 +41,99 @@ public class UnifiedExpressionMapper : ResoniteMod {
 	[ThreadStatic]
 	internal static AutoAssignContext? CurrentContext;
 
+	static readonly Dictionary<string, AvatarExpression> BaseUnifiedExpressionMap = new(StringComparer.OrdinalIgnoreCase) { // really hope these are right, i don't have an avatar with base shapes 😭
+		["NoseSneerRight"] = AvatarExpression.NoseWrinkleRight,
+		["NoseSneerLeft"] = AvatarExpression.NoseWrinkleLeft,
+
+		["CheekSquintRight"] = AvatarExpression.CheekRaiseRight,
+		["CheekSquintLeft"] = AvatarExpression.CheekRaiseLeft,
+		["CheekPuffRight"] = AvatarExpression.CheekPuffRight,
+		["CheekPuffLeft"] = AvatarExpression.CheekPuffLeft,
+		["CheekSuckRight"] = AvatarExpression.CheekSuckRight,
+		["CheekSuckLeft"] = AvatarExpression.CheekSuckLeft,
+
+		["JawOpen"] = AvatarExpression.JawOpen,
+		["JawRight"] = AvatarExpression.JawRight,
+		["JawLeft"] = AvatarExpression.JawLeft,
+		["JawForward"] = AvatarExpression.JawForward,
+
+		["LipSuckUpperRight"] = AvatarExpression.LipUnderlayUpperRight,
+		["LipSuckUpperLeft"] = AvatarExpression.LipUnderlayUpperLeft,
+		["LipSuckLowerRight"] = AvatarExpression.LipUnderlayLowerRight,
+		["LipSuckLowerLeft"] = AvatarExpression.LipUnderlayLowerLeft,
+
+		["LipFunnelUpperRight"] = AvatarExpression.LipTopRightOverturn,
+		["LipFunnelUpperLeft"] = AvatarExpression.LipTopLeftOverturn,
+		["LipFunnelLowerRight"] = AvatarExpression.LipBottomRightOverturn,
+		["LipFunnelLowerLeft"] = AvatarExpression.LipBottomLeftOverturn,
+
+		["LipPuckerUpperRight"] = AvatarExpression.PoutRight,
+		["LipPuckerUpperLeft"] = AvatarExpression.PoutLeft,
+		["LipPuckerLowerRight"] = AvatarExpression.PoutRight,
+		["LipPuckerLowerLeft"] = AvatarExpression.PoutLeft,
+
+		["MouthUpperUpRight"] = AvatarExpression.LipRaiseUpperRight,
+		["MouthUpperUpLeft"] = AvatarExpression.LipRaiseUpperLeft,
+		["MouthLowerDownRight"] = AvatarExpression.LipRaiseLowerRight,
+		["MouthLowerDownLeft"] = AvatarExpression.LipRaiseLowerLeft,
+		["MouthUpperRight"] = AvatarExpression.LipMoveRightUpper,
+		["MouthUpperLeft"] = AvatarExpression.LipMoveLeftUpper,
+		["MouthLowerRight"] = AvatarExpression.LipMoveRightLower,
+		["MouthLowerLeft"] = AvatarExpression.LipMoveLeftLower,
+
+		["MouthCornerPullRight"] = AvatarExpression.SmileRight,
+		["MouthCornerPullLeft"] = AvatarExpression.SmileLeft,
+		["MouthFrownRight"] = AvatarExpression.FrownRight,
+		["MouthFrownLeft"] = AvatarExpression.FrownLeft,
+
+		["MouthStretchRight"] = AvatarExpression.LipStretchRight,
+		["MouthStretchLeft"] = AvatarExpression.LipStretchLeft,
+		["MouthDimpleRight"] = AvatarExpression.MouthDimpleRight,
+		["MouthDimpleLeft"] = AvatarExpression.MouthDimpleLeft,
+		["MouthRaiserUpper"] = AvatarExpression.LipRaiseUpper,
+		["MouthRaiserLower"] = AvatarExpression.LipRaiseLower,
+		["MouthPressRight"] = AvatarExpression.LipsPressRight,
+		["MouthPressLeft"] = AvatarExpression.LipsPressLeft,
+		["MouthTightenerRight"] = AvatarExpression.LipTightenRight,
+		["MouthTightenerLeft"] = AvatarExpression.LipTightenLeft,
+
+		["TongueOut"] = AvatarExpression.TongueOut,
+		["TongueUp"] = AvatarExpression.TongueUp,
+		["TongueDown"] = AvatarExpression.TongueDown,
+		["TongueRight"] = AvatarExpression.TongueRight,
+		["TongueLeft"] = AvatarExpression.TongueLeft,
+		["TongueRoll"] = AvatarExpression.TongueRoll,
+
+		//approximations
+		["JawMandibleRaise"] = AvatarExpression.ChinRaiseBottom, // just from reading the docs i thiiiink this is a good substitute?????
+
+		["MouthCornerSlantRight"] = AvatarExpression.SmileRight, // This SRanipal expression directly controls Unified's MouthCornerPullerRight and MouthCornerSlantRight, creating the MouthSmileRight Blended shape. On many avatars and on the SRanipal reference avatar, the right cheek is squinting when smiling. It is perfectly acceptable to have MouthSmileRight to have this behavior, especially when using SRanipal-compatible tracking with this avatar.
+		["MouthCornerSlantLeft"] = AvatarExpression.SmileLeft, // supposedly this means they can be "coupled" i guess??? maybe???? idk i hope i understood it right
+
+		["LipSuckCornerRight"] = AvatarExpression.LipUnderlayUpperRight,
+		["LipSuckCornerLeft"] = AvatarExpression.LipUnderlayUpperLeft,
+
+		//maybe one day resonite will have these tracked...
+		//["NasalDilationRight"] = null,
+		//["NasalDilationLeft"] = null,
+		//["NasalConstrictRight"] = null,
+		//["NasalConstrictLeft"] = null,
+		//["MouthClosed"] = null,
+		//["JawBackward"] = null,
+		//["JawClench"] = null,
+		//["MouthUpperDeepenRight"] = null,
+		//["MouthUpperDeepenLeft"] = null,
+		//["TongueBendDown"] = null,
+		//["TongueCurlUp"] = null,
+		//["TongueSquish"] = null,
+		//["TongueFlat"] = null,
+		//["TongueTwistRight"] = null,
+		//["TongueTwistLeft"] = null,
+		//["SoftPalateClose"] = null,
+		//["ThroatSwallow"] = null,
+		//["NeckFlexRight"] = null,
+		//["NeckFlexLeft"] = null
+	};
 
 	static readonly Dictionary<string, AvatarExpression> UnifiedExpressionMap = new(StringComparer.OrdinalIgnoreCase) {
 		["NoseSneer"] = AvatarExpression.NoseWrinkle,
@@ -307,7 +400,8 @@ public class UnifiedExpressionMapper : ResoniteMod {
 				}
 
 				// if the shape is part of a map but isn't the 'winner', then there's already another shape driving that expression
-				if (UnifiedExpressionMap.ContainsKey(name) ||
+				if (BaseUnifiedExpressionMap.ContainsKey(name) ||
+					UnifiedExpressionMap.ContainsKey(name) ||
 					ARKitExpressionMap.ContainsKey(name) ||
 					SRanipalExpressionMap.ContainsKey(name) ||
 					FACSExpressionMap.ContainsKey(name)) {
@@ -316,6 +410,9 @@ public class UnifiedExpressionMapper : ResoniteMod {
 				}
 			} else {
 				// fallback just in case autoassign has no context somehow
+				if (BaseUnifiedExpressionMap.TryGetValue(name, out var baseUnifiedConversion)) {
+					__result = baseUnifiedConversion; return false;
+				}
 				if (UnifiedExpressionMap.TryGetValue(name, out var unifiedConversion)) {
 					__result = unifiedConversion; return false;
 				}
@@ -398,26 +495,29 @@ public class UnifiedExpressionMapper : ResoniteMod {
 				}
 			}
 
-			var expressionToBestString = new Dictionary<AvatarExpression, string>();
+			var expressionToStandard = new Dictionary<AvatarExpression, int>();
 
-			void TryMapStandard(Dictionary<string, AvatarExpression> expressionMap) {
+			void TryMapStandard(Dictionary<string, AvatarExpression> expressionMap, int priority) {
 				foreach (var kvp in expressionMap) {
 					string shapeName = kvp.Key;
 					AvatarExpression expr = kvp.Value;
 
 					if (ctx.BlendshapeNames.Contains(shapeName) && !ctx.SuppressedShapes.Contains(shapeName)) {
-						if (!expressionToBestString.ContainsKey(expr)) {
-							expressionToBestString[expr] = shapeName;
+
+						// only allow mapping to the same expression multiple times if it's from the same standard
+						if (!expressionToStandard.TryGetValue(expr, out int currentPriority) || currentPriority == priority) {
+							expressionToStandard[expr] = priority;
 							ctx.MappedShapes[shapeName] = expr;
 						}
 					}
 				}
 			}
 
-			TryMapStandard(UnifiedExpressionMap);
-			TryMapStandard(ARKitExpressionMap);
-			TryMapStandard(SRanipalExpressionMap);
-			TryMapStandard(FACSExpressionMap);
+			TryMapStandard(BaseUnifiedExpressionMap, 0);
+			TryMapStandard(UnifiedExpressionMap, 1);
+			TryMapStandard(ARKitExpressionMap, 2);
+			TryMapStandard(SRanipalExpressionMap, 3);
+			TryMapStandard(FACSExpressionMap, 4);
 		}
 
 		static void Postfix() {
