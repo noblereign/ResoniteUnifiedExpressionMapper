@@ -21,7 +21,7 @@ internal enum FallbackStrategy {
 
 //More info on creating mods can be found https://github.com/resonite-modding-group/ResoniteModLoader/wiki/Creating-Mods
 public class UnifiedExpressionMapper : ResoniteMod {
-	internal const string VERSION_CONSTANT = "1.1.0";
+	internal const string VERSION_CONSTANT = "1.1.1";
 	public override string Name => "UnifiedExpressionMapper";
 	public override string Author => "Noble";
 	public override string Version => VERSION_CONSTANT;
@@ -83,8 +83,10 @@ public class UnifiedExpressionMapper : ResoniteMod {
 
 		["MouthCornerPullRight"] = AvatarExpression.SmileRight,
 		["MouthCornerPullLeft"] = AvatarExpression.SmileLeft,
-		["MouthFrownRight"] = AvatarExpression.FrownRight,
+
+		["MouthFrown"] = AvatarExpression.Frown, // since this is combined it wouldn't be a base shape, but maybe someone will misname it one day and this will save them 😭
 		["MouthFrownLeft"] = AvatarExpression.FrownLeft,
+		["MouthFrownRight"] = AvatarExpression.FrownRight,
 
 		["MouthStretchRight"] = AvatarExpression.LipStretchRight,
 		["MouthStretchLeft"] = AvatarExpression.LipStretchLeft,
@@ -173,8 +175,10 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		["LipFunnelLowerRight"] = AvatarExpression.LipBottomRightOverturn,
 
 		["LipPucker"] = AvatarExpression.Pout,
-		["LipPuckerLeft"] = AvatarExpression.PoutLeft,
-		["LipPuckerRight"] = AvatarExpression.PoutRight,
+		["LipPuckerLeft"] = AvatarExpression.PoutLeft, // THESE TWO...
+		["LipPuckerRight"] = AvatarExpression.PoutRight, // ...ARENT STANDARD!!
+		["LipPuckerUpper"] = AvatarExpression.Pout, // for some reason, resonite has left and right splits for pucker, but not upper and lower like the blended shapes do!
+		["LipPuckerLower"] = AvatarExpression.Pout, // which means sadly, we have to just bind these both to combined pout, otherwise it'd make no sense... :(
 
 		["MouthUpperUp"] = AvatarExpression.LipRaiseUpper,
 		["MouthUpperUpLeft"] = AvatarExpression.LipRaiseUpperLeft,
@@ -192,9 +196,9 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		["MouthSmileLeft"] = AvatarExpression.SmileLeft,
 		["MouthSmileRight"] = AvatarExpression.SmileRight,
 
-		["MouthFrown"] = AvatarExpression.Frown,
-		["MouthFrownLeft"] = AvatarExpression.FrownLeft,
-		["MouthFrownRight"] = AvatarExpression.FrownRight,
+		["MouthSad"] = AvatarExpression.Frown,
+		["MouthSadLeft"] = AvatarExpression.FrownLeft,
+		["MouthSadRight"] = AvatarExpression.FrownRight,
 
 		["MouthStretch"] = AvatarExpression.LipStretch,
 		["MouthStretchLeft"] = AvatarExpression.LipStretchLeft,
