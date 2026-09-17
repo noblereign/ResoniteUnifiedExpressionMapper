@@ -21,11 +21,11 @@ internal enum FallbackStrategy {
 
 //More info on creating mods can be found https://github.com/resonite-modding-group/ResoniteModLoader/wiki/Creating-Mods
 public class UnifiedExpressionMapper : ResoniteMod {
-	internal const string VERSION_CONSTANT = "1.1.1";
+	internal const string VERSION_CONSTANT = "1.1.2";
 	public override string Name => "UnifiedExpressionMapper";
 	public override string Author => "Noble";
 	public override string Version => VERSION_CONSTANT;
-	public override string Link => "https://github.com/resonite-modding-group/UnifiedExpressionMapper/";
+	public override string Link => "https://github.com/noblereign/ResoniteUnifiedExpressionMapper/";
 
 	public static ModConfiguration? Config;
 
