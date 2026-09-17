@@ -572,26 +572,26 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		}
 
 		void AssignFeature(Func<EyeLinearDriver.Eye, FieldDrive<float>> fieldSelector, string[] leftNames, string[] rightNames, string[] combinedNames) {
-			string leftMatch = leftNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
-			string rightMatch = rightNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
+			string? leftMatch = leftNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
+			string? rightMatch = rightNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
 
 			// Prioritize split shapes if at least one exists
 			if (leftMatch != null || rightMatch != null) {
 				if (leftMatch != null) {
 					var eye = GetEye(EyeSide.Left);
-					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[leftMatch]);
+					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[leftMatch])!;
 				}
 				if (rightMatch != null) {
 					var eye = GetEye(EyeSide.Right);
-					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[rightMatch]);
+					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[rightMatch])!;
 				}
 			}
 			// Fallback to combined shapes if no split versions exist
 			else if (combinedNames != null) {
-				string combinedMatch = combinedNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
+				string? combinedMatch = combinedNames.FirstOrDefault(n => blendshapes.ContainsKey(n));
 				if (combinedMatch != null) {
 					var eye = GetEye(EyeSide.Combined);
-					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[combinedMatch]);
+					fieldSelector(eye).Target = primaryRenderer.TryGetBlendShape(blendshapes[combinedMatch])!;
 				}
 			}
 		}
