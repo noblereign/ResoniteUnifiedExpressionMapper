@@ -27,7 +27,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 	public override string Version => VERSION_CONSTANT;
 	public override string Link => "https://github.com/noblereign/ResoniteUnifiedExpressionMapper/";
 
-	public static ModConfiguration? Config;
+	private static ModConfiguration? Config;
 
 	[AutoRegisterConfigKey]
 	public static readonly ModConfigurationKey<bool> Enabled = new("Enabled", "Enables the mod, pretty self-explanatory.", () => true);
@@ -549,7 +549,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 	// referencing https://github.com/djsime1/ResoniteAvatarClothingHelper/blob/master/AvatarClothingHelper/AvatarClothingHelper.cs#L35 for finding the primary renderer
 	public static void AssignEyeShapes(EyeLinearDriver eyeLinearDriver, SkinnedMeshRenderer? primaryRenderer = null) {
 		var skinnedRenderers = eyeLinearDriver.Slot.GetObjectRoot().GetComponentsInChildren<SkinnedMeshRenderer>(renderer => renderer.MeshBlendshapeCount > 0).ToArray();
-		primaryRenderer = primaryRenderer ?? skinnedRenderers.OrderByDescending(renderer => renderer.MeshBlendshapeCount).First();
+		primaryRenderer ??= skinnedRenderers.OrderByDescending(renderer => renderer.MeshBlendshapeCount).First();
 
 		if (primaryRenderer == null) { Warn($"Couldn't find a primary renderer for {eyeLinearDriver.Slot.GetObjectRoot().Name}"); return; };
 
@@ -565,9 +565,7 @@ public class UnifiedExpressionMapper : ResoniteMod {
 				eye = eyeLinearDriver.Eyes.Add();
 				eye.Side.Value = side;
 			}
-			if (eye.ProjectionPlanePoint.Target == null) {
-				eye.ProjectionPlanePoint.Target = eyeLinearDriver.Slot;
-			}
+			eye.ProjectionPlanePoint.Target ??= eyeLinearDriver.Slot;
 			return eye;
 		}
 
@@ -597,59 +595,59 @@ public class UnifiedExpressionMapper : ResoniteMod {
 		}
 
 		AssignFeature(e => e.LookUp,
-			new[] { "EyeLookUpLeft", "eyeLookUpLeft", "Eye_Left_Up", "Eyes_Look_Up_L" },
-			new[] { "EyeLookUpRight", "eyeLookUpRight", "Eye_Right_Up", "Eyes_Look_Up_R" },
-			new[] { "EyeLookUp", "eyeLookUp", "Eye_Up", "Eyes_Look_Up" });
+			["EyeLookUpLeft", "eyeLookUpLeft", "Eye_Left_Up", "Eyes_Look_Up_L"],
+			["EyeLookUpRight", "eyeLookUpRight", "Eye_Right_Up", "Eyes_Look_Up_R"],
+			["EyeLookUp", "eyeLookUp", "Eye_Up", "Eyes_Look_Up"]);
 
 		AssignFeature(e => e.LookDown,
-			new[] { "EyeLookDownLeft", "eyeLookDownLeft", "Eye_Left_Down", "Eyes_Look_Down_L" },
-			new[] { "EyeLookDownRight", "eyeLookDownRight", "Eye_Right_Down", "Eyes_Look_Down_R" },
-			new[] { "EyeLookDown", "eyeLookDown", "Eye_Down", "Eyes_Look_Down" });
+			["EyeLookDownLeft", "eyeLookDownLeft", "Eye_Left_Down", "Eyes_Look_Down_L"],
+			["EyeLookDownRight", "eyeLookDownRight", "Eye_Right_Down", "Eyes_Look_Down_R"],
+			["EyeLookDown", "eyeLookDown", "Eye_Down", "Eyes_Look_Down"]);
 
 		AssignFeature(e => e.LookLeft,
-			new[] { "EyeLookOutLeft", "eyeLookOutLeft", "Eye_Left_Left", "Eyes_Look_Left_L" },
-			new[] { "EyeLookInRight", "eyeLookInRight", "Eye_Right_Left", "Eyes_Look_Left_R" },
-			new[] { "EyeLookLeft", "eyeLookLeft", "Eye_Left", "Eyes_Look_Left" });
+			["EyeLookOutLeft", "eyeLookOutLeft", "Eye_Left_Left", "Eyes_Look_Left_L"],
+			["EyeLookInRight", "eyeLookInRight", "Eye_Right_Left", "Eyes_Look_Left_R"],
+			["EyeLookLeft", "eyeLookLeft", "Eye_Left", "Eyes_Look_Left"]);
 
 		AssignFeature(e => e.LookRight,
-			new[] { "EyeLookInLeft", "eyeLookInLeft", "Eye_Left_Right", "Eyes_Look_Right_L" },
-			new[] { "EyeLookOutRight", "eyeLookOutRight", "Eye_Right_Right", "Eyes_Look_Right_R" },
-			new[] { "EyeLookRight", "eyeLookRight", "Eye_Right", "Eyes_Look_Right" });
+			["EyeLookInLeft", "eyeLookInLeft", "Eye_Left_Right", "Eyes_Look_Right_L"],
+			["EyeLookOutRight", "eyeLookOutRight", "Eye_Right_Right", "Eyes_Look_Right_R"],
+			["EyeLookRight", "eyeLookRight", "Eye_Right", "Eyes_Look_Right"]);
 
 		AssignFeature(e => e.OpenCloseTarget,
-			new[] { "EyeClosedLeft", "eyeBlinkLeft", "Eye_Left_Blink", "Eyes_Closed_L", "vrc.blink_left" },
-			new[] { "EyeClosedRight", "eyeBlinkRight", "Eye_Right_Blink", "Eyes_Closed_R", "vrc.blink_right" },
-			new[] { "EyeClosed", "eyeBlink", "Eye_Blink", "Eyes_Closed", "vrc.blink", "blink" });
+			["EyeClosedLeft", "eyeBlinkLeft", "Eye_Left_Blink", "Eyes_Closed_L", "vrc.blink_left"],
+			["EyeClosedRight", "eyeBlinkRight", "Eye_Right_Blink", "Eyes_Closed_R", "vrc.blink_right"],
+			["EyeClosed", "eyeBlink", "Eye_Blink", "Eyes_Closed", "vrc.blink", "blink"]);
 
 		AssignFeature(e => e.WidenTarget,
-			new[] { "EyeWideLeft", "eyeWideLeft", "Eye_Left_Wide", "Upper_Lid_Raiser_L" },
-			new[] { "EyeWideRight", "eyeWideRight", "Eye_Right_Wide", "Upper_Lid_Raiser_R" },
-			new[] { "EyeWide", "eyeWide", "Eye_Wide", "Upper_Lid_Raiser" });
+			["EyeWideLeft", "eyeWideLeft", "Eye_Left_Wide", "Upper_Lid_Raiser_L"],
+			["EyeWideRight", "eyeWideRight", "Eye_Right_Wide", "Upper_Lid_Raiser_R"],
+			["EyeWide", "eyeWide", "Eye_Wide", "Upper_Lid_Raiser"]);
 
 		AssignFeature(e => e.SqueezeTarget,
-			new[] { "EyeSquintLeft", "eyeSquintLeft", "Eye_Left_squeeze", "Lid_Tightener_L" },
-			new[] { "EyeSquintRight", "eyeSquintRight", "Eye_Right_squeeze", "Lid_Tightener_R" },
-			new[] { "EyeSquint", "eyeSquint", "Eye_squeeze", "Lid_Tightener" });
+			["EyeSquintLeft", "eyeSquintLeft", "Eye_Left_squeeze", "Lid_Tightener_L"],
+			["EyeSquintRight", "eyeSquintRight", "Eye_Right_squeeze", "Lid_Tightener_R"],
+			["EyeSquint", "eyeSquint", "Eye_squeeze", "Lid_Tightener"]);
 
 		AssignFeature(e => e.PupilSizeTarget,
-			new[] { "EyeDilationLeft", "eyeDilationLeft", "Eye_Left_Dilation" },
-			new[] { "EyeDilationRight", "eyeDilationRight", "Eye_Right_Dilation" },
-			new[] { "EyeDilation", "eyeDilation", "Eye_Dilation" });
+			["EyeDilationLeft", "eyeDilationLeft", "Eye_Left_Dilation"],
+			["EyeDilationRight", "eyeDilationRight", "Eye_Right_Dilation"],
+			["EyeDilation", "eyeDilation", "Eye_Dilation"]);
 
 		AssignFeature(e => e.InnerBrowRaiseTarget,
-			new[] { "BrowUpLeft", "BrowInnerUpLeft", "browInnerUpLeft", "Inner_Brow_Raiser_L" },
-			new[] { "BrowUpRight", "BrowInnerUpRight", "browInnerUpRight", "Inner_Brow_Raiser_R" },
-			new[] { "BrowUp", "BrowInnerUp", "browInnerUp", "Inner_Brow_Raiser" });
+			["BrowUpLeft", "BrowInnerUpLeft", "browInnerUpLeft", "Inner_Brow_Raiser_L"],
+			["BrowUpRight", "BrowInnerUpRight", "browInnerUpRight", "Inner_Brow_Raiser_R"],
+			["BrowUp", "BrowInnerUp", "browInnerUp", "Inner_Brow_Raiser"]);
 
 		AssignFeature(e => e.OuterBrowRaiseTarget,
-			new[] { "BrowOuterUpLeft", "browOuterUpLeft", "Outer_Brow_Raiser_L" },
-			new[] { "BrowOuterUpRight", "browOuterUpRight", "Outer_Brow_Raiser_R" },
-			new[] { "BrowOuterUp", "browOuterUp", "Outer_Brow_Raiser" });
+			["BrowOuterUpLeft", "browOuterUpLeft", "Outer_Brow_Raiser_L"],
+			["BrowOuterUpRight", "browOuterUpRight", "Outer_Brow_Raiser_R"],
+			["BrowOuterUp", "browOuterUp", "Outer_Brow_Raiser"]);
 
 		AssignFeature(e => e.InnerBrowLowerTarget,
-			new[] { "BrowLowererLeft", "browDownLeft", "Brow_Lowerer_L" },
-			new[] { "BrowLowererRight", "browDownRight", "Brow_Lowerer_R" },
-			new[] { "BrowLowerer", "browDown", "Brow_Lowerer" });
+			["BrowLowererLeft", "browDownLeft", "Brow_Lowerer_L"],
+			["BrowLowererRight", "browDownRight", "Brow_Lowerer_R"],
+			["BrowLowerer", "browDown", "Brow_Lowerer"]);
 	}
 
 
